@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: bank-fraud-detector
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
