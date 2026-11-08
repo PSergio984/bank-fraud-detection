@@ -15,8 +15,8 @@ This project trains a model that scores each application with a fraud-risk
 score and deploys it as an HTTP service. The service applies a threshold
 chosen so that **at most ~5% of applications are flagged** — matching a
 hypothetical review team's capacity. Under that cap the model catches about
-**53% of all fraud** (vs. the 1.15% fraud base rate — a ~46x lift over random
-triage). It is a prioritization tool, not an auto-reject system: a human
+**53% of all fraud** while flagging 5% of applications — a ~10.5x lift over
+random triage (fraud base rate is ~1.1%). It is a prioritization tool, not an auto-reject system: a human
 reviewer makes the final call.
 
 ## Dataset
@@ -28,7 +28,7 @@ reviewer makes the final call.
   (30 predictors + `fraud_bool` target + `month`).
 - **License:** CC BY-NC-SA 4.0 — semi-synthetic data generated to mirror real
   fraud distributions while protecting customer privacy.
-- **Target:** `fraud_bool` — 1.15% positive (severe class imbalance, so
+- **Target:** `fraud_bool` — 1.10% positive (severe class imbalance, so
   accuracy is meaningless; we use ROC-AUC, PR-AUC, and recall-at-capacity).
 - **Download:** `python get_data.py` (uses the Kaggle API — needs
   `~/.kaggle/kaggle.json`), or download `Base.csv` manually from
@@ -46,10 +46,10 @@ reviewer makes the final call.
 - **Top predictive signals** (mutual information + permutation importance):
   address-history length, `keep_alive_session`, phone/email validity,
   `email_is_free`, employment status.
-- **`device_fraud_count`** is kept as a feature but flagged in the notebook:
-  it aggregates prior fraud on the device and risks near-leakage; the
-  temporal holdout check (below) verifies the model generalizes without it
-  dominating.
+- **`device_fraud_count`** looks like the prime leakage candidate (it counts
+  past fraud on the device) — but in `Base.csv` it is **constant 0 for every
+  row**, so it carries no information. Kept as a harmless constant and
+  flagged in the notebook rather than silently dropped.
 - **Temporal drift exists:** fraud rate rises from ~1.0% (months 0–5) to 1.4%
   (months 6–7) — evaluated explicitly rather than assumed away.
 
@@ -85,8 +85,9 @@ and evaluates once on the untouched test split:
 | Precision at cap | 11.6% |
 | Threshold | 0.7876 |
 
-**Temporal holdout** (train months ≤5 → test months 6–7): ROC-AUC 0.881,
-PR-AUC 0.165, recall at cap 48.6% — consistent with the random split, so the
+**Temporal holdout** (train months ≤5 → test months 6–7, winner's config,
+medians fit on the training period only): ROC-AUC 0.895, PR-AUC 0.198,
+recall at cap 52.1% — consistent with the random split, so the
 metrics are not inflated by time leakage.
 
 For comparison, the alternative "best-F1" threshold would flag only 1.7% of
@@ -125,7 +126,7 @@ python train.py                 # full 1M-row training -> model.bin  (~10-15 min
 uvicorn predict:app --host 0.0.0.0 --port 9696
 ```
 
-Tests: `pytest` (13 tests: preprocessing, artifact contract, API edge cases).
+Tests: `pytest` (11 tests: preprocessing, artifact contract, API edge cases).
 
 ## Run with Docker
 
