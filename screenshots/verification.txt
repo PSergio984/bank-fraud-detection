@@ -1,0 +1,17 @@
+Deployment verification — bank-fraud container (image bank-fraud, python:3.12-slim)
+
+$ docker build -t bank-fraud .
+  -> build OK, image size 1.53GB
+
+$ docker run --rm -d -p 9696:9696 --name bankfraud bank-fraud
+$ curl http://localhost:9696/health
+  -> {"status":"ok"}
+
+$ curl -X POST http://localhost:9696/predict \
+       -H "Content-Type: application/json" \
+       -d @sample-request.json
+  -> {"fraud_score": 0.8367716073989868, "decision": true}
+
+screenshots/swagger-docs.png  = Swagger UI served by the container (both endpoints + Application schema)
+screenshots/predict-response.json = real /predict response (application from a known-fraud row: score 0.837 > threshold 0.7876 -> flagged for review)
+sample-request.json           = example request body usable with curl / Swagger "Try it out"
