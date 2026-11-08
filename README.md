@@ -105,7 +105,7 @@ test_*.py             pytest suite (features, artifact contract, API edge cases)
 requirements.txt      runtime deps (pinned) — what Docker installs
 requirements-dev.txt  + notebook/test tooling
 Dockerfile            python:3.12-slim serving image
-model.bin             trained artifact (gitignored — regenerate with train.py)
+model.bin             trained artifact (committed for one-command deploy; regenerate with train.py)
 data/                 gitignored — 700MB CSV, fetch via get_data.py
 ```
 
@@ -130,10 +130,12 @@ Tests: `pytest` (13 tests: preprocessing, artifact contract, API edge cases).
 ## Run with Docker
 
 ```bash
-python train.py                 # produces model.bin (build copies it in)
-docker build -t bank-fraud .
+docker build -t bank-fraud .    # model.bin is committed — no training needed
 docker run --rm -p 9696:9696 bank-fraud
 ```
+
+(To rebuild from a fresh model, run `python train.py` first — it overwrites
+`model.bin`.)
 
 Verified: image builds clean (1.5 GB — most of it is xgboost's Linux NCCL
 dependency), `/health` and `/predict` both respond inside the container.

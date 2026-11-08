@@ -1,5 +1,4 @@
 data/
-model.bin
 .venv/
 __pycache__/
 *.pyc
