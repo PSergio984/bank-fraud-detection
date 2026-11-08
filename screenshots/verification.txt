@@ -15,3 +15,10 @@ $ curl -X POST http://localhost:9696/predict \
 screenshots/swagger-docs.png  = Swagger UI served by the container (both endpoints + Application schema)
 screenshots/predict-response.json = real /predict response (application from a known-fraud row: score 0.837 > threshold 0.7876 -> flagged for review)
 sample-request.json           = example request body usable with curl / Swagger "Try it out"
+
+--- cloud (Render) ---
+$ curl https://bank-fraud-detection-618y.onrender.com/health
+  -> {"status":"ok"}
+$ curl -X POST https://bank-fraud-detection-618y.onrender.com/predict -H "Content-Type: application/json" -d @sample-request.json
+  -> {"fraud_score":0.8367716073989868,"decision":true}
+screenshots/render-deploy.png = Swagger UI served by the live Render instance

@@ -162,12 +162,20 @@ this repo is a ready-to-use example body
 (`curl -X POST localhost:9696/predict -H "Content-Type: application/json" -d @sample-request.json`);
 the Swagger UI at `/docs` also shows the full schema.
 
-## Deployment evidence
+## Deployment
 
-Local Docker verification (Task checklist evidence): see `screenshots/` —
-container running, `/health` 200, and a `/predict` response. (Cloud deploy
-tracked separately — the image is platform-agnostic: any host that runs a
-container on port 9696 works.)
+**Live on Render (Docker):** https://bank-fraud-detection-618y.onrender.com
+
+- Swagger UI: https://bank-fraud-detection-618y.onrender.com/docs
+- `GET /health` → `{"status":"ok"}`
+- `POST /predict` with `sample-request.json` → `{"fraud_score":0.8368,"decision":true}`
+- Deployed via `render.yaml` blueprint — Render builds the `Dockerfile`
+  directly from this repo. Free tier: first request after idle cold-starts
+  (~30–60s).
+
+Local Docker verification evidence: see `screenshots/` —
+`swagger-docs.png` + `render-deploy.png` (live docs UI), `predict-response.json`,
+and `verification.txt` (exact commands and outputs).
 
 ## Limitations & next steps
 
