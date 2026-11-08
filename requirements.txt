@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+xgboost
+fastapi
+uvicorn[standard]
+matplotlib
+seaborn
+jupyter
+pytest
+requests

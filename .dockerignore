@@ -1,0 +1,11 @@
+data/
+.venv/
+__pycache__/
+*.pyc
+catboost_info/
+.ipynb_checkpoints/
+.superpowers/
+.git/
+docs/
+notebook.ipynb
+screenshots/
